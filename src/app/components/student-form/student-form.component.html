@@ -1,0 +1,13 @@
+<h2 appHeader>{{ isEditing ? 'Editar' : 'Nuevo' }} Alumno</h2>
+<form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
+  <mat-form-field>
+    <input matInput placeholder="Nombre" formControlName="firstName">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput placeholder="Apellido" formControlName="lastName">
+  </mat-form-field>
+  <mat-form-field>
+    <input matInput placeholder="Email" formControlName="email">
+  </mat-form-field>
+  <button mat-raised-button color="primary" type="submit">Guardar</button>
+</form>
