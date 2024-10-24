@@ -1,0 +1,34 @@
+<h2 mat-dialog-title>{{ dialogTitle }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="enrollmentForm">
+    <mat-form-field appearance="fill">
+      <mat-label>Alumno</mat-label>
+      <mat-select formControlName="studentId">
+        <mat-option *ngFor="let student of students" [value]="student.id">
+          {{ student.firstName }} {{ student.lastName }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="enrollmentForm.get('studentId')?.hasError('required')">Seleccione un alumno.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Curso</mat-label>
+      <mat-select formControlName="courseId">
+        <mat-option *ngFor="let course of courses" [value]="course.id">
+          {{ course.name }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="enrollmentForm.get('courseId')?.hasError('required')">Seleccione un curso.</mat-error>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+      <mat-label>Fecha asignación</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="enrollmentDate">
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="enrollmentForm.get('enrollmentDate')?.hasError('required')">Fecha de asignación es requerida.</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!enrollmentForm.valid">Guardar</button>
+</mat-dialog-actions>

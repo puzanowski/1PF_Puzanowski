@@ -1,0 +1,33 @@
+<h2>Lista de asignaciones</h2>
+<button mat-raised-button color="primary" (click)="openDialog()">Nueva asignación</button>
+<table mat-table [dataSource]="enrollments">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef>ID</th>
+    <td mat-cell *matCellDef="let enrollment">{{ enrollment.id }}</td>
+  </ng-container>
+  <ng-container matColumnDef="studentName">
+    <th mat-header-cell *matHeaderCellDef>Alumno</th>
+    <td mat-cell *matCellDef="let enrollment">{{ enrollment.studentName }}</td>
+  </ng-container>
+  <ng-container matColumnDef="courseName">
+    <th mat-header-cell *matHeaderCellDef>Curso</th>
+    <td mat-cell *matCellDef="let enrollment">{{ enrollment.courseName }}</td>
+  </ng-container>
+  <ng-container matColumnDef="enrollmentDate">
+    <th mat-header-cell *matHeaderCellDef>Fecha asignación</th>
+    <td mat-cell *matCellDef="let enrollment">{{ enrollment.enrollmentDate | date }}</td>
+  </ng-container>
+  <ng-container matColumnDef="actions">
+    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+    <td mat-cell *matCellDef="let enrollment">
+      <button mat-icon-button color="primary" (click)="openDialog(enrollment)">
+        <mat-icon>edit</mat-icon>
+      </button>
+      <button mat-icon-button color="warn" (click)="deleteEnrollment(enrollment)">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </td>
+  </ng-container>
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>

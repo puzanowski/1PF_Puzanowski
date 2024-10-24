@@ -11,6 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatSelectModule } from '@angular/material/select';
 import { RouterModule } from '@angular/router';
 
 import { AppComponent } from './app.component';
@@ -22,6 +24,13 @@ import { FullNamePipe } from './pipes/full-name.pipe';
 import { HeaderDirective } from '../directives/header.directive';
 import { StudentDialogComponent } from './components/student-dialog/student-dialog.component';
 import { HttpClientModule } from '@angular/common/http';
+import { CourseListComponent } from './components/course-list/course-list.component';
+import { EnrollmentDialogComponent } from './components/enrollment-dialog/enrollment-dialog.component';
+import { EnrollmentListComponent } from './components/enrollment-list/enrollment-list.component';
+import { DatePipe } from '@angular/common';
+import { CourseDialogComponent } from './components/course-dialog/course-dialog.component';
+import { MatNativeDateModule } from '@angular/material/core';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +41,12 @@ import { HttpClientModule } from '@angular/common/http';
     StudentFormComponent,
     FullNamePipe,
     HeaderDirective,
-    StudentDialogComponent
+    StudentDialogComponent,
+    CourseListComponent,
+    EnrollmentDialogComponent,
+    EnrollmentListComponent,
+    CourseDialogComponent,
+    DashboardComponent
   ],
   imports: [
     HttpClientModule,
@@ -46,10 +60,16 @@ import { HttpClientModule } from '@angular/common/http';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatSelectModule,
     MatDialogModule,
     MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    DatePipe,
     RouterModule.forRoot([
       { path: 'students', component: StudentListComponent },
+      { path: 'courses', component: CourseListComponent },
+      { path: 'enrollments', component: EnrollmentListComponent },
       { path: '', redirectTo: '/students', pathMatch: 'full' }
     ])
   ],

@@ -12,5 +12,22 @@
       "lastName": "García",
       "email": "maria@example.com"
     }
+  ],
+  "courses": [
+    {
+      "id": "1",
+      "name": "Biología",
+      "description": "12e4",
+      "quantity": "10",
+      "assignedProfessor": "Pedro Otero"
+    }
+  ],
+  "enrollments": [
+    {
+      "id": "1",
+      "studentId": "1",
+      "courseId": "0a70",
+      "enrollmentDate": "2024-10-21T22:46:24.954Z"
+    }
   ]
 }
