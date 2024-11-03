@@ -1,11 +1,11 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Enrollment } from '../../models/enrollment.model';
-import { Student } from '../../models/student.model';
-import { Course } from '../../models/course.model';
-import { StudentsService } from '../../services/students.service';
-import { CourseService } from '../../services/course.service';
+import { Enrollment } from '../../../../shared/models/enrollment.model';
+import { Student } from '../../../../shared/models/student.model';
+import { Course } from '../../../../shared/models/course.model';
+import { StudentsService } from '../../../../shared/services/students.service';
+import { CourseService } from '../../../../shared/services/course.service';
 
 @Component({
   selector: 'app-enrollment-dialog',

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Enrollment } from '../../models/enrollment.model';
-import { EnrollmentService } from '../../services/enrollment.service';
-import { StudentsService } from '../../services/students.service';
-import { CourseService } from '../../services/course.service';
+import { Enrollment } from '../../../../shared/models/enrollment.model';
+import { EnrollmentService } from '../../../../shared/services/enrollment.service';
+import { StudentsService } from '../../../../shared/services/students.service';
+import { CourseService } from '../../../../shared/services/course.service';
 import { EnrollmentDialogComponent } from '../enrollment-dialog/enrollment-dialog.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, forkJoin, of, switchMap, tap } from 'rxjs';

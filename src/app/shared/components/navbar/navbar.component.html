@@ -1,11 +1,11 @@
 <mat-sidenav-container>
   <mat-sidenav #sidenav mode="side" [(opened)]="sidenavOpened" class="mat-primary" class="pepe">
       <mat-nav-list>
-        <a mat-list-item routerLink="/students" routerLinkActive="active-list-item">
+        <a mat-list-item routerLink="/dashboard/students" routerLinkActive="active-list-item">
           Alumnos
         </a>
-        <a mat-list-item routerLink="/courses" routerLinkActive="pepe">Cursos</a>
-        <a mat-list-item routerLink="/enrollments" routerLinkActive="pepe">Asignaciones</a>
+        <a mat-list-item routerLink="/dashboard/courses" routerLinkActive="active-list-item">Cursos</a>
+        <a mat-list-item routerLink="/dashboard/enrollments" routerLinkActive="active-list-item">Asignaciones</a>
       </mat-nav-list>
     </mat-sidenav>
     <mat-sidenav-content>

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Student } from '../../models/student.model';
+import { Student } from '../../../../shared/models/student.model';
 import { StudentDialogComponent } from '../student-dialog/student-dialog.component';
-import { StudentsService } from '../../services/students.service';
+import { StudentsService } from '../../../../shared/services/students.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError, of, switchMap, tap } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-student-list',

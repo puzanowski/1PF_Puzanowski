@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { catchError, tap, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { Course } from '../../models/course.model';
-import { CourseService } from '../../services/course.service';
+import { Course } from '../../../../shared/models/course.model';
+import { CourseService } from '../../../../shared/services/course.service';
 import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 

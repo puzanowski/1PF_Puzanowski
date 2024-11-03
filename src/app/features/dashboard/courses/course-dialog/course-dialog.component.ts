@@ -1,7 +1,7 @@
 import { Component, Inject, OnInit, ɵɵviewQuerySignal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Course } from '../../models/course.model';
+import { Course } from '../../../../shared/models/course.model';
 
 @Component({
   selector: 'app-course-dialog',
