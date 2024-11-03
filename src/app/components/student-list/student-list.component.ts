@@ -4,6 +4,7 @@ import { Student } from '../../models/student.model';
 import { StudentDialogComponent } from '../student-dialog/student-dialog.component';
 import { StudentsService } from '../../services/students.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { catchError, of, switchMap, tap } from 'rxjs';
 
 @Component({
   selector: 'app-student-list',
@@ -15,7 +16,7 @@ export class StudentListComponent implements OnInit {
   displayedColumns: string[] = ['id', 'fullName', 'email', 'actions'];
 
   constructor(
-    private dialog: MatDialog, 
+    private dialog: MatDialog,
     private studentsService: StudentsService
   ) {}
 
@@ -24,14 +25,15 @@ export class StudentListComponent implements OnInit {
   }
 
   loadStudents() {
-    this.studentsService.getStudents().subscribe(
-      (students: Student[]) => {
+    this.studentsService.getStudents().pipe(
+      tap((students: Student[]) => {
         this.students = students;
-      },
-      (error: HttpErrorResponse) => {
+      }),
+      catchError((error: HttpErrorResponse) => {
         console.error('Error cargando estudiantes:', error);
-      }
-    );
+        return of([]);
+      })
+    ).subscribe();
   }
 
   openDialog(student?: Student) {
@@ -40,41 +42,43 @@ export class StudentListComponent implements OnInit {
       data: { student: student || {}, isNew: !student }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        if (result.id) {
-          this.studentsService.updateStudent(result).subscribe(
-            () => {
-              this.loadStudents();
-            },
-            (error: HttpErrorResponse) => {
-              console.error('Error actualizando estudiante:', error);
-            }
-          );
-        } else {
-          this.studentsService.addStudent(result).subscribe(
-            () => {
-              this.loadStudents();
-            },
-            (error: HttpErrorResponse) => {
-              console.error('Error agregando estudiante:', error);
-            }
-          );
+    dialogRef.afterClosed().pipe(
+      switchMap(result => {
+        if (result) {
+          if (result.id) {
+            // Actualizar estudiante
+            return this.studentsService.updateStudent(result).pipe(
+              tap(() => this.loadStudents()),
+              catchError((error: HttpErrorResponse) => {
+                console.error('Error actualizando estudiante:', error);
+                return of(null);
+              })
+            );
+          } else {
+            // Agregar nuevo estudiante
+            return this.studentsService.addStudent(result).pipe(
+              tap(() => this.loadStudents()),
+              catchError((error: HttpErrorResponse) => {
+                console.error('Error agregando estudiante:', error);
+                return of(null);
+              })
+            );
+          }
         }
-      }
-    });
+        return of(null);
+      })
+    ).subscribe();
   }
 
   deleteStudent(student: Student) {
     if (confirm(`¿Estás seguro de que quieres eliminar a ${student.firstName} ${student.lastName}?`)) {
-      this.studentsService.deleteStudent(student.id!).subscribe(
-        () => {
-          this.loadStudents();
-        },
-        (error: HttpErrorResponse) => {
+      this.studentsService.deleteStudent(student.id!).pipe(
+        tap(() => this.loadStudents()),
+        catchError((error: HttpErrorResponse) => {
           console.error('Error eliminando estudiante:', error);
-        }
-      );
+          return of(null);
+        })
+      ).subscribe();
     }
   }
 }
