@@ -61,12 +61,24 @@ export class EnrollmentListComponent implements OnInit {
       switchMap(result => {
         if (result) {
           if (result.id) {
-            // Editar asignación.
-            return of(null);
+            // Editar asignación
+            return this.enrollmentService.updateEnrollment(result).pipe(
+              tap(() => {
+                this.loadEnrollments();
+                console.log('Asignación actualizada exitosamente.');
+              }),
+              catchError((error: HttpErrorResponse) => {
+                console.error('Error actualizando asignación:', error);
+                return of(null);
+              })
+            );
           } else {
-            // Agregar nueva asignación.
+            // Agregar nueva asignación
             return this.enrollmentService.addEnrollment(result).pipe(
-              tap(() => this.loadEnrollments()),
+              tap(() => {
+                this.loadEnrollments();
+                console.log('Asignación agregada exitosamente.');
+              }),
               catchError((error: HttpErrorResponse) => {
                 console.error('Error agregando asignación:', error);
                 return of(null);

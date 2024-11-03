@@ -19,6 +19,10 @@ export class EnrollmentService {
     return this.http.post<Enrollment>(this.apiUrl, enrollment);
   }
 
+  updateEnrollment(enrollment: Enrollment): Observable<Enrollment> {
+    return this.http.put<Enrollment>(`${this.apiUrl}/${enrollment.id}`, enrollment);
+  }
+
   deleteEnrollment(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

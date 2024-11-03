@@ -6,6 +6,7 @@ import { Student } from '../../../../shared/models/student.model';
 import { Course } from '../../../../shared/models/course.model';
 import { StudentsService } from '../../../../shared/services/students.service';
 import { CourseService } from '../../../../shared/services/course.service';
+import { catchError, of, tap } from 'rxjs';
 
 @Component({
   selector: 'app-enrollment-dialog',
@@ -42,27 +43,29 @@ export class EnrollmentDialogComponent implements OnInit {
   greaterThanZeroValidator(control: FormControl) {
     return control.value > 0 ? null : { greaterThanZero: true };
   }
-
+ 
   loadStudents() {
-    this.studentService.getStudents().subscribe(
-      (students) => {
+    this.studentService.getStudents().pipe(
+      tap((students) => {
         this.students = students;
-      },
-      (error) => {
+      }),
+      catchError((error) => {
         console.error('Error cargando alumnos:', error);
-      }
-    );
+        return of([]);
+      })
+    ).subscribe();
   }
 
   loadCourses() {
-    this.courseService.getCourses().subscribe(
-      (courses) => {
+    this.courseService.getCourses().pipe(
+      tap((courses) => {
         this.courses = courses;
-      },
-      (error) => {
+      }),
+      catchError((error) => {
         console.error('Error cargando cursos:', error);
-      }
-    );
+        return of([]);
+      })
+    ).subscribe();
   }
 
   onSubmit() {
