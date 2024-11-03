@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Enrollment } from '../../../../shared/models/enrollment.model';
 import { Student } from '../../../../shared/models/student.model';
@@ -30,13 +30,17 @@ export class EnrollmentDialogComponent implements OnInit {
 
   ngOnInit() {
     this.enrollmentForm = this.fb.group({
-      studentId: [this.data.enrollment.studentId || 0, Validators.required],
-      courseId: [this.data.enrollment.courseId || 0, Validators.required],
+      studentId: [this.data.enrollment.studentId || 0, [Validators.required, this.greaterThanZeroValidator]],
+      courseId: [this.data.enrollment.courseId || 0, [Validators.required, this.greaterThanZeroValidator]],
       enrollmentDate: [this.data.enrollment.enrollmentDate || new Date(), Validators.required]
     });
 
     this.loadStudents();
     this.loadCourses();
+  }
+  
+  greaterThanZeroValidator(control: FormControl) {
+    return control.value > 0 ? null : { greaterThanZero: true };
   }
 
   loadStudents() {
