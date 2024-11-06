@@ -65,7 +65,6 @@ export class EnrollmentListComponent implements OnInit {
             return this.enrollmentService.updateEnrollment(result).pipe(
               tap(() => {
                 this.loadEnrollments();
-                console.log('Asignación actualizada exitosamente.');
               }),
               catchError((error: HttpErrorResponse) => {
                 console.error('Error actualizando asignación:', error);
@@ -77,7 +76,6 @@ export class EnrollmentListComponent implements OnInit {
             return this.enrollmentService.addEnrollment(result).pipe(
               tap(() => {
                 this.loadEnrollments();
-                console.log('Asignación agregada exitosamente.');
               }),
               catchError((error: HttpErrorResponse) => {
                 console.error('Error agregando asignación:', error);

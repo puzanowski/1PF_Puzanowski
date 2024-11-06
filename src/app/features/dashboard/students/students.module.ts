@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StudentFormComponent } from './student-form/student-form.component';
 import { StudentListComponent } from './student-list/student-list.component';
 import { StudentDialogComponent } from './student-dialog/student-dialog.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -19,8 +18,7 @@ const routes: Routes = [
 ];
 
 @NgModule({
-  declarations: [ 
-    StudentFormComponent,
+  declarations: [
     StudentListComponent,
     StudentDialogComponent
   ],

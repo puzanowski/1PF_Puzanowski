@@ -36,23 +36,15 @@ Este proyecto es una aplicación de gestión de alumnos desarrollada con Angular
 
 1. Inicia el servidor de desarrollo de Angular:
    ```
-   ng serve
+   ng serve -o
    ```
 
 2. En otra terminal, inicia JSON Server:
    ```
-   json-server src/app/data/db.json
+   json-server --watch src/app/data/db.json --middlewares src/app/middlewares/auth-middleware.js
    ```
 
 3. Abre tu navegador y visita `http://localhost:4200`.
-
-## Estructura del proyecto
-
-- `src/app/components`: Contiene los componentes de la aplicación.
-- `src/app/services`: Contiene los servicios para la lógica de negocio.
-- `src/app/models`: Contiene las interfaces y modelos de datos.
-- `src/app/pipes`: Contiene pipes personalizados.
-- `src/app/directives`: Contiene directivas personalizadas.
 
 ## Tecnologías utilizadas
 

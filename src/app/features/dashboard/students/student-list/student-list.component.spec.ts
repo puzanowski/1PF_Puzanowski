@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { HttpClientModule } from '@angular/common/http';
 import { StudentListComponent } from './student-list.component';
+import { MatTableModule } from '@angular/material/table';
 
 describe('StudentListComponent', () => {
   let component: StudentListComponent;
@@ -8,7 +9,8 @@ describe('StudentListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [StudentListComponent]
+      declarations: [StudentListComponent],
+      imports: [HttpClientModule, MatTableModule] 
     })
     .compileComponents();
     

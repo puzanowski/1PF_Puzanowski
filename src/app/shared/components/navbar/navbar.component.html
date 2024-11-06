@@ -1,14 +1,27 @@
 <mat-sidenav-container>
-  <mat-sidenav #sidenav mode="side" [(opened)]="sidenavOpened" class="mat-primary" class="pepe">
-      <mat-nav-list>
+  <mat-sidenav #sidenav mode="side" [(opened)]="sidenavOpened" class="mat-primary pepe">
+    <mat-nav-list>
+      @if(isAdmin) {
         <a mat-list-item routerLink="/dashboard/students" routerLinkActive="active-list-item">
           Alumnos
         </a>
-        <a mat-list-item routerLink="/dashboard/courses" routerLinkActive="active-list-item">Cursos</a>
-        <a mat-list-item routerLink="/dashboard/enrollments" routerLinkActive="active-list-item">Asignaciones</a>
-      </mat-nav-list>
-    </mat-sidenav>
-    <mat-sidenav-content>
-      <ng-content></ng-content>
-    </mat-sidenav-content>
-  </mat-sidenav-container>
+      }      
+      <a mat-list-item routerLink="/dashboard/courses" routerLinkActive="active-list-item">
+        Cursos
+      </a>
+      <a mat-list-item routerLink="/dashboard/enrollments" routerLinkActive="active-list-item">
+        Asignaciones
+      </a>
+    </mat-nav-list>
+    <!-- Contenedor de pie -->
+    <div style="margin-top: auto; padding: 16px; text-align: center;">
+      <button mat-button (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Cerrar sesión
+      </button>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <ng-content></ng-content>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -22,7 +22,7 @@ import { DashboardModule } from './features/dashboard/dashboard.module';
     ReactiveFormsModule,
     DatePipe,    
     AppRoutingModule,
-    DashboardModule
+    DashboardModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
