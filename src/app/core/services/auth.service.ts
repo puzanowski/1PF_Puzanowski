@@ -20,7 +20,7 @@ export class AuthService {
     }
 
     login(username: string, password: string): Observable<User | null> {
-        return this.httpClient.post<User>(`${this.baseUrl}/auth/login`, { username, password })
+        return this.httpClient.post<User>(`${this.baseUrl}auth/login`, { username, password })
             .pipe(
                 tap(user => {
                     this.user = user;

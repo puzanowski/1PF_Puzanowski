@@ -13,7 +13,7 @@ function generateRandomToken(length) {
 module.exports = (req, res, next) => {
     if (req.method === 'POST' && req.path === '/auth/login') {
         const { username, password } = req.body;
-        const dbPath = path.join(__dirname, '../data/db.json');
+        const dbPath = path.join(__dirname, 'db.json');
         const db = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
 
         const user = db.users.find(
