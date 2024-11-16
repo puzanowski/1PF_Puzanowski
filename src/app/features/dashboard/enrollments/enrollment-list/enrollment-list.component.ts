@@ -6,6 +6,7 @@ import { Enrollment } from '../../../../shared/models/enrollment.model';
 import { EnrollmentDialogComponent } from '../enrollment-dialog/enrollment-dialog.component';
 import * as EnrollmentActions from '../../../../store/actions/enrollment.actions';
 import * as EnrollmentSelectors from '../../../../store/selectors/enrollment.selectors';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-enrollment-list',
@@ -15,14 +16,21 @@ import * as EnrollmentSelectors from '../../../../store/selectors/enrollment.sel
 export class EnrollmentListComponent implements OnInit {
   enrollments$: Observable<Enrollment[]>;
   loading$: Observable<boolean>;
-  displayedColumns: string[] = ['id', 'studentName', 'courseName', 'enrollmentDate', 'actions'];
+  displayedColumns: string[] = ['id', 'studentName', 'courseName', 'enrollmentDate'];
+  isAdmin: boolean = false;
 
   constructor(
     private dialog: MatDialog,
-    private store: Store<any>
+    private store: Store<any>,
+    private authService: AuthService
   ) {
     this.enrollments$ = this.store.select(EnrollmentSelectors.selectAllEnrollments) as Observable<Enrollment[]>;
     this.loading$ = this.store.select(EnrollmentSelectors.selectEnrollmentsLoading);
+    this.isAdmin = this.authService.currentUser?.role === 'admin';
+    
+    if (this.isAdmin) {
+      this.displayedColumns.push('actions');
+    }
   }
 
   ngOnInit() {
@@ -30,6 +38,8 @@ export class EnrollmentListComponent implements OnInit {
   }
 
   openDialog(enrollment?: Enrollment) {
+    if (!this.isAdmin) return;
+
     const dialogRef = this.dialog.open(EnrollmentDialogComponent, {
       width: '400px',
       data: { enrollment: enrollment || {}, isNew: !enrollment }
@@ -47,6 +57,8 @@ export class EnrollmentListComponent implements OnInit {
   }
 
   deleteEnrollment(id: number) {
+    if (!this.isAdmin) return;
+    
     if (confirm('¿Estás seguro de que quieres eliminar esta asignación?')) {
       this.store.dispatch(EnrollmentActions.deleteEnrollment({ id }));
     }

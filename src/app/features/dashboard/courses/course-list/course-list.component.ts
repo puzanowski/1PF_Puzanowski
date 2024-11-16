@@ -6,7 +6,7 @@ import { Course } from '../../../../shared/models/course.model';
 import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import * as CourseActions from '../../../../store/actions/course.actions';
 import * as CourseSelectors from '../../../../store/selectors/course.selectors';
-import { map } from 'rxjs/operators';
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-course-list',
@@ -16,14 +16,21 @@ import { map } from 'rxjs/operators';
 export class CourseListComponent implements OnInit {
   courses$: Observable<Course[]>;
   loading$: Observable<boolean>;
-  displayedColumns: string[] = ['id', 'name', 'description', 'quantity', 'assignedProfessor', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'description', 'quantity', 'assignedProfessor'];
+  isAdmin: boolean = false;
 
   constructor(
     private dialog: MatDialog,
-    private store: Store<any>
+    private store: Store<any>,
+    private authService: AuthService
   ) {
     this.courses$ = this.store.select(CourseSelectors.selectAllCourses) as Observable<Course[]>;
     this.loading$ = this.store.select(CourseSelectors.selectCoursesLoading);
+    this.isAdmin = this.authService.currentUser?.role === 'admin';
+    
+    if (this.isAdmin) {
+      this.displayedColumns.push('actions');
+    }
   }
 
   ngOnInit() {
@@ -35,6 +42,8 @@ export class CourseListComponent implements OnInit {
   }
 
   openDialog(course?: Course) {
+    if (!this.isAdmin) return;
+
     const dialogRef = this.dialog.open(CourseDialogComponent, {
       width: '400px',
       data: { course: course || {}, isNew: !course }
@@ -43,10 +52,8 @@ export class CourseListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (result.id) {
-          // Editar curso
           this.store.dispatch(CourseActions.updateCourse({ course: result }));
         } else {
-          // Agregar nuevo curso
           this.store.dispatch(CourseActions.addCourse({ course: result }));
         }
       }
@@ -54,6 +61,8 @@ export class CourseListComponent implements OnInit {
   }
 
   deleteCourse(course: Course) {
+    if (!this.isAdmin) return;
+    
     if (confirm(`¿Estás seguro de que quieres eliminar el curso ${course.name}?`)) {
       this.store.dispatch(CourseActions.deleteCourse({ id: course.id! }));
     }
