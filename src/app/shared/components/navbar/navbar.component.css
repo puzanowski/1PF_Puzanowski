@@ -3,21 +3,25 @@ mat-sidenav-container {
 }
 
 mat-sidenav {
-  width: 200px;
-  background-color: #673ab7;  
+  width: 260px;
+  background: linear-gradient(180deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+  color: white;
 } 
 
 .user-info {
-  padding: 16px;
+  padding: 24px 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  background: rgba(255,255,255,0.1);
+  margin-bottom: 16px;
 }
 
 .user-avatar {
-  font-size: 40px;
-  width: 40px;
-  height: 40px;
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: white;
 }
 
 .user-details {
@@ -28,11 +32,46 @@ mat-sidenav {
 .user-name {
   font-weight: 500;
   font-size: 16px;
+  color: white;
+  margin-bottom: 4px;
 }
 
 .user-role {
   font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
+  color: rgba(255,255,255,0.8);
+}
+
+mat-nav-list {
+  padding-top: 8px;
+}
+
+mat-nav-list a {
+  color: white !important;
+  margin: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+mat-nav-list a:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.active-list-item {
+  background: rgba(255,255,255,0.2) !important;
+}
+
+.logout-container {
+  position: absolute;
+  bottom: 16px;
+  width: 100%;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.logout-button {
+  width: 100%;
+  color: white !important;
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 mat-divider {
