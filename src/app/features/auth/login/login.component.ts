@@ -12,6 +12,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -32,6 +33,7 @@ export class LoginComponent implements OnInit {
       return;
     }
 
+    this.isLoading = true;
     const { username, password } = this.loginForm.value;
 
     try {
@@ -44,6 +46,8 @@ export class LoginComponent implements OnInit {
       }
     } catch (error) {
       this.showSnackBar('Error al intentar iniciar sesión. Inténtalo de nuevo más tarde.');
+    } finally {
+      this.isLoading = false;
     }
   }
 

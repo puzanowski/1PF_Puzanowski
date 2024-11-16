@@ -1,4 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { selectAllStudents, selectStudentsLoading } from '../../../../store/selectors/student.selectors';
+import * as StudentActions from '../../../../store/actions/student.actions';
+import { Observable } from 'rxjs';
 import { Student } from '../../../../shared/models/student.model';
 import { StudentDialogComponent } from '../student-dialog/student-dialog.component';
 import { StudentsService } from '../../../../shared/services/students.service';
@@ -12,31 +16,24 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./student-list.component.css']
 })
 export class StudentListComponent implements OnInit {
-  students: Student[] = [];
+  students$: Observable<Student[]>;
+  loading$: Observable<boolean>;
   displayedColumns: string[] = ['id', 'fullName', 'email', 'actions'];
 
   constructor(
     private dialog: MatDialog,
-    private studentsService: StudentsService
-  ) {}
+    private studentsService: StudentsService,
+    private store: Store<any>
+  ) {
+    this.students$ = this.store.select(selectAllStudents) as Observable<Student[]>;
+    this.loading$ = this.store.select(selectStudentsLoading);
+ }
 
   ngOnInit() {
-    this.loadStudents();
+    this.store.dispatch(StudentActions.loadStudents());
   }
 
-  loadStudents() {
-    this.studentsService.getStudents().pipe(
-      tap((students: Student[]) => {
-        this.students = students;
-      }),
-      catchError((error: HttpErrorResponse) => {
-        console.error('Error cargando estudiantes:', error);
-        return of([]);
-      })
-    ).subscribe();
-  }
-
-  openDialog(student?: Student) {
+  openDialog(student?: Student): void {
     const dialogRef = this.dialog.open(StudentDialogComponent, {
       width: '400px',
       data: { student: student || {}, isNew: !student }
@@ -46,23 +43,9 @@ export class StudentListComponent implements OnInit {
       switchMap(result => {
         if (result) {
           if (result.id) {
-            // Actualizar estudiante
-            return this.studentsService.updateStudent(result).pipe(
-              tap(() => this.loadStudents()),
-              catchError((error: HttpErrorResponse) => {
-                console.error('Error actualizando estudiante:', error);
-                return of(null);
-              })
-            );
+            this.store.dispatch(StudentActions.updateStudent({ student: result }));
           } else {
-            // Agregar nuevo estudiante
-            return this.studentsService.addStudent(result).pipe(
-              tap(() => this.loadStudents()),
-              catchError((error: HttpErrorResponse) => {
-                console.error('Error agregando estudiante:', error);
-                return of(null);
-              })
-            );
+            this.store.dispatch(StudentActions.addStudent({ student: result }));
           }
         }
         return of(null);
@@ -72,13 +55,7 @@ export class StudentListComponent implements OnInit {
 
   deleteStudent(student: Student) {
     if (confirm(`¿Estás seguro de que quieres eliminar a ${student.firstName} ${student.lastName}?`)) {
-      this.studentsService.deleteStudent(student.id!).pipe(
-        tap(() => this.loadStudents()),
-        catchError((error: HttpErrorResponse) => {
-          console.error('Error eliminando estudiante:', error);
-          return of(null);
-        })
-      ).subscribe();
+      this.store.dispatch(StudentActions.deleteStudent({ id: student.id! }));
     }
   }
 }

@@ -10,24 +10,35 @@ const routes: Routes = [
     component: DashboardComponent,
     canActivate: [authGuard],
     children: [
-        {
-                path: 'students',
-                canActivate: [adminGuard],
-                loadChildren: () => import('../../features/dashboard/students/students.module')
-                        .then(m => m.StudentsModule)
-   
-        },
+      {
+              path: 'students',
+              canActivate: [adminGuard],
+              loadChildren: () => import('./students/students.module')
+                      .then(m => m.StudentsModule)
+ 
+      },
+      {
+              path: 'users',
+              canActivate: [adminGuard],
+              loadChildren: () => import('./users/users.module')
+                      .then(m => m.UsersModule)
+ 
+      },
         {
                 path: 'courses',     
-                loadChildren: () => import('../../features/dashboard/courses/courses.module')
+                loadChildren: () => import('./courses/courses.module')
                         .then(m => m.CoursesModule)
    
         },
         {
                 path: 'enrollments',     
-                loadChildren: () => import('../../features/dashboard/enrollments/enrollments.module')
+                loadChildren: () => import('./enrollments/enrollments.module')
                         .then(m => m.EnrollmentsModule)
    
+        },
+        {
+          path: '**',
+          redirectTo: 'courses'
         }
     ]
   },

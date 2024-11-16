@@ -2,3 +2,23 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Cargando tabla */
+.table-container {
+  position: relative;
+  min-height: 200px;
+}
+
+.loading-shade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.loading-table {
+  position: relative;
+  opacity: 0.1;
+  transition: opacity 0.3s ease-in-out;
+}

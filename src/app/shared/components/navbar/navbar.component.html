@@ -2,10 +2,14 @@
   <mat-sidenav #sidenav mode="side" [(opened)]="sidenavOpened" class="mat-primary pepe">
     <mat-nav-list>
       @if(isAdmin) {
-        <a mat-list-item routerLink="/dashboard/students" routerLinkActive="active-list-item">
-          Alumnos
+        <a mat-list-item routerLink="/dashboard/users" routerLinkActive="active-list-item">
+          Usuarios
         </a>
       }      
+      
+      <a mat-list-item routerLink="/dashboard/students" routerLinkActive="active-list-item">
+        Alumnos
+      </a>
       <a mat-list-item routerLink="/dashboard/courses" routerLinkActive="active-list-item">
         Cursos
       </a>

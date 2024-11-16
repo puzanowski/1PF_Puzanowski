@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
 import { Enrollment } from '../../../../shared/models/enrollment.model';
-import { EnrollmentService } from '../../../../shared/services/enrollment.service';
-import { StudentsService } from '../../../../shared/services/students.service';
-import { CourseService } from '../../../../shared/services/course.service';
 import { EnrollmentDialogComponent } from '../enrollment-dialog/enrollment-dialog.component';
-import { HttpErrorResponse } from '@angular/common/http';
-import { catchError, forkJoin, of, switchMap, tap } from 'rxjs';
+import * as EnrollmentActions from '../../../../store/actions/enrollment.actions';
+import * as EnrollmentSelectors from '../../../../store/selectors/enrollment.selectors';
 
 @Component({
   selector: 'app-enrollment-list',
@@ -14,41 +13,20 @@ import { catchError, forkJoin, of, switchMap, tap } from 'rxjs';
   styleUrls: ['./enrollment-list.component.css']
 })
 export class EnrollmentListComponent implements OnInit {
-  enrollments: Enrollment[] = [];
+  enrollments$: Observable<Enrollment[]>;
+  loading$: Observable<boolean>;
   displayedColumns: string[] = ['id', 'studentName', 'courseName', 'enrollmentDate', 'actions'];
 
   constructor(
     private dialog: MatDialog,
-    private enrollmentService: EnrollmentService,
-    private studentsService: StudentsService,
-    private courseService: CourseService
-  ) {}
-
-  ngOnInit() {
-    this.loadEnrollments();
+    private store: Store<any>
+  ) {
+    this.enrollments$ = this.store.select(EnrollmentSelectors.selectAllEnrollments) as Observable<Enrollment[]>;
+    this.loading$ = this.store.select(EnrollmentSelectors.selectEnrollmentsLoading);
   }
 
-  loadEnrollments() {
-    this.enrollmentService.getEnrollments().pipe(
-      tap(enrollments => {
-        this.enrollments = enrollments;
-      }),
-      switchMap(() => forkJoin([
-        this.studentsService.getStudents(),
-        this.courseService.getCourses()
-      ])),
-      tap(([students, courses]) => {
-        this.enrollments = this.enrollments.map(enrollment => ({
-          ...enrollment,
-          studentName: `${students.find(s => s.id === enrollment.studentId)?.firstName} ${students.find(s => s.id === enrollment.studentId)?.lastName}`,
-          courseName: courses.find(c => c.id === enrollment.courseId)?.name
-        }));
-      }),
-      catchError(error => {
-        console.error('Error loading enrollments or related data:', error);
-        return of([]);
-      })
-    ).subscribe();
+  ngOnInit() {
+    this.store.dispatch(EnrollmentActions.loadEnrollments());
   }
 
   openDialog(enrollment?: Enrollment) {
@@ -57,47 +35,20 @@ export class EnrollmentListComponent implements OnInit {
       data: { enrollment: enrollment || {}, isNew: !enrollment }
     });
 
-    dialogRef.afterClosed().pipe(
-      switchMap(result => {
-        if (result) {
-          if (result.id) {
-            // Editar asignación
-            return this.enrollmentService.updateEnrollment(result).pipe(
-              tap(() => {
-                this.loadEnrollments();
-              }),
-              catchError((error: HttpErrorResponse) => {
-                console.error('Error actualizando asignación:', error);
-                return of(null);
-              })
-            );
-          } else {
-            // Agregar nueva asignación
-            return this.enrollmentService.addEnrollment(result).pipe(
-              tap(() => {
-                this.loadEnrollments();
-              }),
-              catchError((error: HttpErrorResponse) => {
-                console.error('Error agregando asignación:', error);
-                return of(null);
-              })
-            );
-          }
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        if (result.id) {
+          this.store.dispatch(EnrollmentActions.updateEnrollment({ enrollment: result }));
+        } else {
+          this.store.dispatch(EnrollmentActions.addEnrollment({ enrollment: result }));
         }
-        return of(null);
-      })
-    ).subscribe();
+      }
+    });
   }
 
-  deleteEnrollment(enrollment: Enrollment) {
-    if (confirm(`¿Estás seguro de que quieres eliminar esta asignación?`)) {
-      this.enrollmentService.deleteEnrollment(enrollment.id!).pipe(
-        tap(() => this.loadEnrollments()),
-        catchError((error: HttpErrorResponse) => {
-          console.error('Error eliminando asignación:', error);
-          return of(null);
-        })
-      ).subscribe();
+  deleteEnrollment(id: number) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta asignación?')) {
+      this.store.dispatch(EnrollmentActions.deleteEnrollment({ id }));
     }
   }
 }

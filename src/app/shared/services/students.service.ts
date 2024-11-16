@@ -8,7 +8,7 @@ import { environments } from '../../../environments/environments';
   providedIn: 'root'
 })
 export class StudentsService {
-  private apiUrl = `${environments.baseUrl}/students`;
+  private apiUrl = `${environments.baseUrl}students`;
 
   constructor(private http: HttpClient) { }
 

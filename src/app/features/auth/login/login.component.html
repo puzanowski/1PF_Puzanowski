@@ -12,9 +12,12 @@
         <input type="password" matInput placeholder="Contraseña" formControlName="password" required>
       </mat-form-field>
   
-      <button type="submit" mat-button mat-flat-button color="primary" [disabled]="loginForm.invalid">
-        <mat-icon>login</mat-icon>
-        Ingresar
+      <button type="submit" mat-button mat-flat-button color="primary" [disabled]="loginForm.invalid || isLoading">
+        <mat-spinner *ngIf="isLoading" diameter="20" class="mr-2"></mat-spinner>
+        <span *ngIf="!isLoading">
+          <mat-icon>login</mat-icon>
+          Ingresar
+        </span>
       </button>
   
       <div class="link-container mt-5">
