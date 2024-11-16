@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Enrollment } from '../models/enrollment.model';
-import { environments } from '../../../environments/environments';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EnrollmentService {
-  private apiUrl = `${environments.baseUrl}enrollments`;
+  private apiUrl = `${environment.baseUrl}enrollments`;
 
   constructor(private http: HttpClient) { }
 

@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { EnrollmentListComponent } from './enrollment-list.component';
 import { SharedModule } from '../../../../shared/shared.module';
 import { HttpClientModule } from '@angular/common/http';
+import { provideMockStore } from '@ngrx/store/testing';
+import { AuthService } from '../../../../core/services/auth.service';
 
 describe('EnrollmentListComponent', () => {
   let component: EnrollmentListComponent;
@@ -11,7 +12,8 @@ describe('EnrollmentListComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [HttpClientModule, SharedModule],
-      declarations: [EnrollmentListComponent]
+      declarations: [EnrollmentListComponent],
+      providers: [provideMockStore(), AuthService]
     })
     .compileComponents();
     

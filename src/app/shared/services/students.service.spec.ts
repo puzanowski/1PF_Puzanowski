@@ -2,10 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { StudentsService } from './students.service';
 import { Student } from '../models/student.model';
+import { environment } from '../../../environments/environment';
 
 describe('StudentsService', () => {
   let service: StudentsService;
   let httpMock: HttpTestingController;
+  const apiUrl = `${environment.baseUrl}students`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -36,7 +38,7 @@ describe('StudentsService', () => {
       expect(students).toEqual(mockStudents);
     });
 
-    const req = httpMock.expectOne('http://localhost:3000/students');
+    const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('GET');
     req.flush(mockStudents);
   });
@@ -48,7 +50,7 @@ describe('StudentsService', () => {
       expect(student).toEqual(newStudent);
     });
 
-    const req = httpMock.expectOne('http://localhost:3000/students');
+    const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(newStudent);
     req.flush(newStudent);
@@ -61,9 +63,9 @@ describe('StudentsService', () => {
       expect(student).toEqual(updatedStudent);
     });
 
-    const req = httpMock.expectOne('http://localhost:3000/students/1');
+    const req = httpMock.expectOne(`${apiUrl}/${updatedStudent.id}`);
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual(updatedStudent);
     req.flush(updatedStudent);
-  });  
+  });
 });
