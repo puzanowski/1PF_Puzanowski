@@ -6,3 +6,35 @@ mat-sidenav {
   width: 200px;
   background-color: #673ab7;  
 } 
+
+.user-info {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.user-role {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+mat-divider {
+  margin: 0 0 8px 0;
+} 

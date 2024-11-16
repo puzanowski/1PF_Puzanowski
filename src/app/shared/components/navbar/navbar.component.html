@@ -1,5 +1,13 @@
 <mat-sidenav-container>
   <mat-sidenav #sidenav mode="side" [(opened)]="sidenavOpened" class="mat-primary pepe">
+    <div class="user-info">
+      <mat-icon class="user-avatar">account_circle</mat-icon>
+      <div class="user-details">
+        <span class="user-name">Bienvenido {{ currentUser?.username }}</span>
+        <span class="user-role">Rol: {{ currentUser?.role | titlecase }}</span>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
     <mat-nav-list>
       @if(isAdmin) {
         <a mat-list-item routerLink="/dashboard/users" routerLinkActive="active-list-item">
@@ -17,7 +25,6 @@
         Asignaciones
       </a>
     </mat-nav-list>
-    <!-- Contenedor de pie -->
     <div style="margin-top: auto; padding: 16px; text-align: center;">
       <button mat-button (click)="logout()">
         <mat-icon>logout</mat-icon>
