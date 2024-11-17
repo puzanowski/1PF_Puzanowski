@@ -1,0 +1,43 @@
+<div class="detail-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Detalle del Alumno</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="student-info">
+        <h3>{{ student?.firstName }} {{ student?.lastName }}</h3>
+        <p>Email: {{ student?.email }}</p>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <h3>Cursos Inscritos</h3>
+      <div class="enrollments-container">
+        <mat-progress-spinner
+          *ngIf="loading"
+          mode="indeterminate"
+          diameter="40"
+          class="loading-spinner">
+        </mat-progress-spinner>
+
+        <mat-list *ngIf="!loading">
+          <mat-list-item *ngFor="let enrollment of enrollments">
+            <div class="enrollment-item">
+              <span>{{ enrollment.course?.name }}</span>
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="unenroll(enrollment.id!)"
+                [disabled]="!enrollment.id"
+                *ngIf="isAdmin"
+              >
+                <mat-icon>person_remove</mat-icon>
+              </button>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div> 

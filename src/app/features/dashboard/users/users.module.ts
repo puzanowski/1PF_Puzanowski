@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from '../../../shared/shared.module';
 import { UserListComponent } from './user-list/user-list.component';
 import { UserDialogComponent } from './user-dialog/user-dialog.component';
+import { ConfirmDialogComponent } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 
 const routes: Routes = [
   {
@@ -20,7 +21,8 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     UserListComponent,
-    UserDialogComponent
+    UserDialogComponent,
+    ConfirmDialogComponent
   ],
   imports: [
     CommonModule,

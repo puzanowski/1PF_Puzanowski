@@ -47,6 +47,10 @@ export class AuthService {
         localStorage.clear();
     }
 
+    isAdmin(): boolean {
+        return this.user?.role === 'admin';
+    }
+
     private loadUserFromLocalStorage(): void {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {

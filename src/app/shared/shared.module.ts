@@ -14,6 +14,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FullNamePipe } from './pipes/full-name.pipe';
+import { MatCardModule } from '@angular/material/card';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
 
 
 
@@ -35,7 +37,8 @@ import { FullNamePipe } from './pipes/full-name.pipe';
     MatDatepickerModule,
     MatNativeDateModule,
     MatDialogModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatCardModule
   ],
   exports: [
     MatToolbarModule,
@@ -53,7 +56,8 @@ import { FullNamePipe } from './pipes/full-name.pipe';
     MatDialogModule,
     FullNamePipe,
     MatProgressBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatCardModule
   ]
 })
 export class SharedModule { }

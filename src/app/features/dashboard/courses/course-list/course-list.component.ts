@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { Course } from '../../../../shared/models/course.model';
 import { CourseDialogComponent } from '../course-dialog/course-dialog.component';
 import * as CourseActions from '../../../../store/actions/course.actions';
-import * as CourseSelectors from '../../../../store/selectors/course.selectors';
+import { selectAllCourses, selectCoursesLoading } from '../../../../store/selectors/course.selectors';
 import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
@@ -13,19 +14,18 @@ import { AuthService } from '../../../../core/services/auth.service';
   templateUrl: './course-list.component.html',
   styleUrls: ['./course-list.component.css']
 })
-export class CourseListComponent implements OnInit {
-  courses$: Observable<Course[]>;
-  loading$: Observable<boolean>;
-  displayedColumns: string[] = ['id', 'name', 'description', 'quantity', 'assignedProfessor'];
-  isAdmin: boolean = false;
+export class CourseListComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+  courses$ = this.store.select(selectAllCourses);
+  loading$ = this.store.select(selectCoursesLoading);
+  isAdmin = true;
+  displayedColumns: string[] = ['id', 'name', 'description', 'quantity', 'assignedProfessor', 'details'];
 
   constructor(
+    private store: Store,
     private dialog: MatDialog,
-    private store: Store<any>,
     private authService: AuthService
   ) {
-    this.courses$ = this.store.select(CourseSelectors.selectAllCourses) as Observable<Course[]>;
-    this.loading$ = this.store.select(CourseSelectors.selectCoursesLoading);
     this.isAdmin = this.authService.currentUser?.role === 'admin';
     
     if (this.isAdmin) {
@@ -34,11 +34,12 @@ export class CourseListComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.loadCourses();
+    this.store.dispatch(CourseActions.loadCourses());
   }
 
-  loadCourses() {
-    this.store.dispatch(CourseActions.loadCourses());
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   openDialog(course?: Course) {
@@ -63,8 +64,16 @@ export class CourseListComponent implements OnInit {
   deleteCourse(course: Course) {
     if (!this.isAdmin) return;
     
-    if (confirm(`¿Estás seguro de que quieres eliminar el curso ${course.name}?`)) {
-      this.store.dispatch(CourseActions.deleteCourse({ id: course.id! }));
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: {
+        title: 'Confirmar eliminación',
+        message: `¿Estás seguro de que quieres eliminar el curso ${course.name}?`,
+        onConfirm: () => {
+          this.store.dispatch(CourseActions.deleteCourse({ id: course.id! }));
+          this.store.dispatch(CourseActions.loadCourses());
+        }
+      }
+    });
   }
 }

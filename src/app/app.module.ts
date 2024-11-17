@@ -7,7 +7,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppComponent } from './app.component';
-import { HeaderDirective } from '../directives/header.directive';
+import { HeaderDirective } from './shared/directives/header.directive';
 import { HttpClientModule } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
 import { AppRoutingModule } from './app-routing.module';

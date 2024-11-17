@@ -5,11 +5,17 @@ import { StudentDialogComponent } from './student-dialog/student-dialog.componen
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
+import { StudentDetailComponent } from './student-detail/student-detail.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 const routes: Routes = [
   {
     path: '',
     component: StudentListComponent,
+  },
+  {
+    path: ':id',
+    component: StudentDetailComponent
   },
   {
     path: '**',
@@ -20,13 +26,15 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     StudentListComponent,
-    StudentDialogComponent
+    StudentDialogComponent,
+    StudentDetailComponent
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     SharedModule,
     RouterModule.forChild(routes),
+    MatProgressSpinnerModule
   ],
   exports: [
     StudentListComponent

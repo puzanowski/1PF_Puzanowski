@@ -5,6 +5,7 @@ import { CourseDialogComponent } from './course-dialog/course-dialog.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../../../shared/shared.module';
+import { CourseDetailComponent } from './course-detail/course-detail.component';
 
 const routes: Routes = [
   {
@@ -12,15 +13,16 @@ const routes: Routes = [
     component: CourseListComponent,
   },
   {
-    path: '**',
-    component: CourseListComponent,
+    path: ':id',
+    component: CourseDetailComponent
   }
 ];
 
 @NgModule({
   declarations: [
     CourseListComponent,
-    CourseDialogComponent
+    CourseDialogComponent,
+    CourseDetailComponent
   ],
   imports: [
     CommonModule,

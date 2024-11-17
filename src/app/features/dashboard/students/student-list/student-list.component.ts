@@ -17,12 +17,11 @@ import { AuthService } from '../../../../core/services/auth.service';
 export class StudentListComponent implements OnInit {
   students$: Observable<Student[]>;
   loading$: Observable<boolean>;
-  displayedColumns: string[] = ['id', 'fullName', 'email'];
+  displayedColumns: string[] = ['id', 'fullName', 'email', 'details'];
   isAdmin: boolean = false;
 
   constructor(
     private dialog: MatDialog,
-    private studentsService: StudentsService,
     private store: Store<any>,
     private authService: AuthService
   ) {
