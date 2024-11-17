@@ -5,20 +5,25 @@ export const selectEnrollmentState = createFeatureSelector<EnrollmentState>('enr
 
 export const selectAllEnrollments = createSelector(
   selectEnrollmentState,
-  state => Object.values(state.entities)
+  (state) => state.enrollments
 );
 
 export const selectEnrollmentsLoading = createSelector(
   selectEnrollmentState,
-  state => state.loading
+  (state) => state.loading
 );
 
-export const selectEnrollmentsError = createSelector(
+export const selectEnrollmentError = createSelector(
   selectEnrollmentState,
-  state => state.error
+  (state) => state.error
 );
 
 export const selectEnrollmentById = (id: number) => createSelector(
-  selectEnrollmentState,
-  state => state.entities[id]
+  selectAllEnrollments,
+  (enrollments) => enrollments.find(enrollment => enrollment.id === id)
+);
+
+export const selectEnrollmentsTotal = createSelector(
+  selectAllEnrollments,
+  (enrollments) => enrollments.length
 );

@@ -31,4 +31,9 @@ export class StudentsService {
   getStudentById(id: number): Observable<Student> {
     return this.http.get<Student>(`${this.apiUrl}/${id}`);
   }
+
+  getStudentsByIds(ids: number[]): Observable<Student[]> {
+    const queries = ids.map(id => `id=${id}`).join('&');
+    return this.http.get<Student[]>(`${this.apiUrl}?${queries}`);
+  }
 }

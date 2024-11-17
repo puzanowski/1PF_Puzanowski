@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, switchMap, map, finalize } from 'rxjs';
+import { Observable, switchMap, map, finalize, tap, combineLatest } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Student } from '../../../../shared/models/student.model';
 import { Enrollment } from '../../../../shared/models/enrollment.model';
@@ -26,7 +26,7 @@ export class StudentDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private studentsService: StudentsService,
     private enrollmentService: EnrollmentService,
-    private store: Store,
+    private store: Store<{ enrollments: { enrollments: Enrollment[], loading: boolean } }>,
     private dialog: MatDialog,
     private authService: AuthService
   ) {
@@ -35,23 +35,17 @@ export class StudentDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.pipe(
-      switchMap(params => this.studentsService.getStudentById(Number(params['id'])))
-    ).subscribe(student => {
-      this.student = student;
-      this.loadEnrollments();
+      switchMap(params => this.studentsService.getStudentById(Number(params['id']))),
+      tap(student => this.student = student),
+      switchMap(student => {
+        this.loading = true;
+        return this.enrollmentService.getEnrollmentsByStudentId(student.id!).pipe(
+          finalize(() => this.loading = false)
+        );
+      })
+    ).subscribe(enrollments => {
+      this.enrollments = enrollments;
     });
-  }
-
-  loadEnrollments() {
-    if (this.student?.id) {
-      this.loading = true;
-      this.enrollmentService.getEnrollments().pipe(
-        map(enrollments => enrollments.filter(e => e.studentId === this.student?.id)),
-        finalize(() => this.loading = false)
-      ).subscribe(enrollments => {
-        this.enrollments = enrollments;
-      });
-    }
   }
 
   unenroll(enrollmentId: number) {
@@ -62,7 +56,6 @@ export class StudentDetailComponent implements OnInit {
         message: '¿Estás seguro de que deseas desmatricular al alumno de este curso?',
         onConfirm: () => {
           this.store.dispatch(EnrollmentActions.deleteEnrollment({ id: enrollmentId }));
-          this.loadEnrollments();
         }
       }
     });

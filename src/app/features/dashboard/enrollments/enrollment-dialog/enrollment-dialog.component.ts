@@ -45,35 +45,39 @@ export class EnrollmentDialogComponent implements OnInit {
   }
  
   loadStudents() {
-    this.studentService.getStudents().pipe(
-      tap((students) => {
+    this.studentService.getStudents().subscribe({
+      next: (students) => {
         this.students = students;
-      }),
-      catchError((error) => {
+      },
+      error: (error) => {
         console.error('Error cargando alumnos:', error);
-        return of([]);
-      })
-    ).subscribe();
+      }
+    });
   }
 
   loadCourses() {
-    this.courseService.getCourses().pipe(
-      tap((courses) => {
+    this.courseService.getCourses().subscribe({
+      next: (courses) => {
         this.courses = courses;
-      }),
-      catchError((error) => {
+      },
+      error: (error) => {
         console.error('Error cargando cursos:', error);
-        return of([]);
-      })
-    ).subscribe();
+      }
+    });
   }
 
   onSubmit() {
     if (this.enrollmentForm.valid) {
+      const selectedStudent = this.students.find(s => s.id === this.enrollmentForm.value.studentId);
+      const selectedCourse = this.courses.find(c => c.id === this.enrollmentForm.value.courseId);
+      
       const enrollment: Enrollment = {
         ...this.data.enrollment,
-        ...this.enrollmentForm.value
+        ...this.enrollmentForm.value,
+        student: selectedStudent,
+        course: selectedCourse
       };
+      
       this.dialogRef.close(enrollment);
     }
   }

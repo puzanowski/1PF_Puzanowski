@@ -31,4 +31,9 @@ export class CourseService {
   getCourseById(id: number): Observable<Course> {
     return this.http.get<Course>(`${this.apiUrl}/${id}`);
   }
+  
+  getCoursesByIds(ids: number[]): Observable<Course[]> {
+    const queries = ids.map(id => `id=${id}`).join('&');
+    return this.http.get<Course[]>(`${this.apiUrl}?${queries}`);
+  }
 }

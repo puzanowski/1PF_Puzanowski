@@ -8,7 +8,6 @@ export const adminGuard: CanActivateFn = (route, state) => {
 
   const user = authService.currentUser;
 
-  console.log('guard', user);
   if (user && user.role === 'admin') {
     return true; 
   } else {

@@ -1,33 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { Enrollment } from '../../../../shared/models/enrollment.model';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
+import { tap, switchMap, combineLatest, map } from 'rxjs/operators';
+import { of } from 'rxjs';
+
+import { EnrollmentDisplay } from '@shared/models/enrollment.model';
+import { AuthService } from '@core/services/auth.service';
+import * as EnrollmentActions from '@store/actions/enrollment.actions';
+import { EnrollmentState } from '@store/reducers/enrollment.reducer';
+import { selectAllEnrollments, selectEnrollmentsLoading } from '@store/selectors/enrollment.selectors';
 import { EnrollmentDialogComponent } from '../enrollment-dialog/enrollment-dialog.component';
-import * as EnrollmentActions from '../../../../store/actions/enrollment.actions';
-import * as EnrollmentSelectors from '../../../../store/selectors/enrollment.selectors';
-import { AuthService } from '../../../../core/services/auth.service';
+import { StudentsService } from '@shared/services/students.service';
+import { CourseService } from '@shared/services/course.service';
 
 @Component({
   selector: 'app-enrollment-list',
   templateUrl: './enrollment-list.component.html',
   styleUrls: ['./enrollment-list.component.css']
 })
-export class EnrollmentListComponent implements OnInit {
-  enrollments$: Observable<Enrollment[]>;
-  loading$: Observable<boolean>;
-  displayedColumns: string[] = ['id', 'studentName', 'courseName', 'enrollmentDate'];
-  isAdmin: boolean = false;
+export class EnrollmentListComponent implements OnInit, OnDestroy {
+  displayedColumns = ['id', 'studentName', 'courseName', 'enrollmentDate'];
+  dataSource = new MatTableDataSource<EnrollmentDisplay>();
+  loading$ = this.store.select(selectEnrollmentsLoading);
+  isAdmin = false;
+  private subscription: Subscription | undefined;
 
   constructor(
+    private store: Store<{ enrollments: EnrollmentState }>,
     private dialog: MatDialog,
-    private store: Store<any>,
     private authService: AuthService
   ) {
-    this.enrollments$ = this.store.select(EnrollmentSelectors.selectAllEnrollments) as Observable<Enrollment[]>;
-    this.loading$ = this.store.select(EnrollmentSelectors.selectEnrollmentsLoading);
-    this.isAdmin = this.authService.currentUser?.role === 'admin';
-    
+    this.isAdmin = this.authService.isAdmin();
     if (this.isAdmin) {
       this.displayedColumns.push('actions');
     }
@@ -35,14 +40,33 @@ export class EnrollmentListComponent implements OnInit {
 
   ngOnInit() {
     this.store.dispatch(EnrollmentActions.loadEnrollments());
+    
+    this.subscription = this.store.select(selectAllEnrollments)
+      .subscribe(enrollments => {
+        console.log('Enrollments:', enrollments);
+        const normalizedEnrollments: EnrollmentDisplay[] = enrollments.map(enrollment => ({
+          ...enrollment,
+          studentName: enrollment.student 
+            ? `${enrollment.student.firstName} ${enrollment.student.lastName}`
+            : `ID: ${enrollment.studentId}`,
+          courseName: enrollment.course?.name || `ID: ${enrollment.courseId}`
+        }));
+        this.dataSource.data = normalizedEnrollments;
+      });
   }
 
-  openDialog(enrollment?: Enrollment) {
-    if (!this.isAdmin) return;
-
+  openDialog(enrollment?: EnrollmentDisplay) {
     const dialogRef = this.dialog.open(EnrollmentDialogComponent, {
       width: '400px',
-      data: { enrollment: enrollment || {}, isNew: !enrollment }
+      data: {
+        enrollment: enrollment ? {
+          id: enrollment.id,
+          studentId: enrollment.studentId,
+          courseId: enrollment.courseId,
+          enrollmentDate: enrollment.enrollmentDate
+        } : {},
+        isNew: !enrollment
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -57,10 +81,12 @@ export class EnrollmentListComponent implements OnInit {
   }
 
   deleteEnrollment(id: number) {
-    if (!this.isAdmin) return;
-    
-    if (confirm('¿Estás seguro de que quieres eliminar esta asignación?')) {
-      this.store.dispatch(EnrollmentActions.deleteEnrollment({ id }));
+    this.store.dispatch(EnrollmentActions.deleteEnrollment({ id }));
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
   }
 }

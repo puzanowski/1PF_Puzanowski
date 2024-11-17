@@ -7,49 +7,53 @@ import * as EnrollmentActions from '../actions/enrollment.actions';
 
 @Injectable()
 export class EnrollmentEffects {
-  loadEnrollments$ = createEffect(() => 
-    this.actions$.pipe(
+  loadEnrollments$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(EnrollmentActions.loadEnrollments),
-      mergeMap(() => this.enrollmentService.getEnrollments()
-        .pipe(
+      mergeMap(() => 
+        this.enrollmentService.getEnrollments().pipe(
           map(enrollments => EnrollmentActions.loadEnrollmentsSuccess({ enrollments })),
-          catchError(error => of(EnrollmentActions.loadEnrollmentsFailure({ error: error.message })))
-        ))
-    )
-  );
+          catchError(error => of(EnrollmentActions.loadEnrollmentsFailure({ error })))
+        )
+      )
+    );
+  });
 
-  addEnrollment$ = createEffect(() =>
-    this.actions$.pipe(
+  addEnrollment$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(EnrollmentActions.addEnrollment),
-      mergeMap(({ enrollment }) => this.enrollmentService.addEnrollment(enrollment)
-        .pipe(
+      mergeMap(({ enrollment }) => 
+        this.enrollmentService.addEnrollment(enrollment).pipe(
           map(newEnrollment => EnrollmentActions.addEnrollmentSuccess({ enrollment: newEnrollment })),
-          catchError(error => of(EnrollmentActions.addEnrollmentFailure({ error: error.message })))
-        ))
-    )
-  );
+          catchError(error => of(EnrollmentActions.addEnrollmentFailure({ error })))
+        )
+      )
+    );
+  });
 
-  updateEnrollment$ = createEffect(() =>
-    this.actions$.pipe(
+  updateEnrollment$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(EnrollmentActions.updateEnrollment),
-      mergeMap(({ enrollment }) => this.enrollmentService.updateEnrollment(enrollment)
-        .pipe(
+      mergeMap(({ enrollment }) => 
+        this.enrollmentService.updateEnrollment(enrollment).pipe(
           map(updatedEnrollment => EnrollmentActions.updateEnrollmentSuccess({ enrollment: updatedEnrollment })),
-          catchError(error => of(EnrollmentActions.updateEnrollmentFailure({ error: error.message })))
-        ))
-    )
-  );
+          catchError(error => of(EnrollmentActions.updateEnrollmentFailure({ error })))
+        )
+      )
+    );
+  });
 
-  deleteEnrollment$ = createEffect(() =>
-    this.actions$.pipe(
+  deleteEnrollment$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(EnrollmentActions.deleteEnrollment),
-      mergeMap(({ id }) => this.enrollmentService.deleteEnrollment(id)
-        .pipe(
+      mergeMap(({ id }) => 
+        this.enrollmentService.deleteEnrollment(id).pipe(
           map(() => EnrollmentActions.deleteEnrollmentSuccess({ id })),
-          catchError(error => of(EnrollmentActions.deleteEnrollmentFailure({ error: error.message })))
-        ))
-    )
-  );
+          catchError(error => of(EnrollmentActions.deleteEnrollmentFailure({ error })))
+        )
+      )
+    );
+  });
 
   constructor(
     private actions$: Actions,

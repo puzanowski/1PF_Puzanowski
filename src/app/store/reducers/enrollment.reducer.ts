@@ -1,31 +1,35 @@
 import { createReducer, on } from '@ngrx/store';
-import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { Enrollment } from '../../shared/models/enrollment.model';
 import * as EnrollmentActions from '../actions/enrollment.actions';
 
-export interface EnrollmentState extends EntityState<Enrollment> {
+export interface EnrollmentState {
+  enrollments: Enrollment[];
   loading: boolean;
   error: any;
 }
 
-export const adapter: EntityAdapter<Enrollment> = createEntityAdapter<Enrollment>();
-
-export const initialState: EnrollmentState = adapter.getInitialState({
+export const initialState: EnrollmentState = {
+  enrollments: [],
   loading: false,
   error: null
-});
+};
 
 export const enrollmentReducer = createReducer(
   initialState,
+  
   // Load
   on(EnrollmentActions.loadEnrollments, state => ({
     ...state,
     loading: true,
     error: null
   })),
-  on(EnrollmentActions.loadEnrollmentsSuccess, (state, { enrollments }) => 
-    adapter.setAll(enrollments, { ...state, loading: false })
-  ),
+  
+  on(EnrollmentActions.loadEnrollmentsSuccess, (state, { enrollments }) => ({
+    ...state,
+    enrollments,
+    loading: false
+  })),
+  
   on(EnrollmentActions.loadEnrollmentsFailure, (state, { error }) => ({
     ...state,
     error,
@@ -38,12 +42,17 @@ export const enrollmentReducer = createReducer(
     loading: true,
     error: null
   })),
-  on(EnrollmentActions.addEnrollmentSuccess, (state, { enrollment }) =>
-    adapter.addOne(enrollment, { ...state, loading: false })
-  ),
+  
+  on(EnrollmentActions.addEnrollmentSuccess, (state, { enrollment }) => ({
+    ...state,
+    enrollments: [...state.enrollments, enrollment],
+    loading: false
+  })),
+  
   on(EnrollmentActions.addEnrollmentFailure, (state, { error }) => ({
     ...state,
-    error
+    error,
+    loading: false
   })),
 
   // Update
@@ -52,15 +61,19 @@ export const enrollmentReducer = createReducer(
     loading: true,
     error: null
   })),
-  on(EnrollmentActions.updateEnrollmentSuccess, (state, { enrollment }) =>
-    adapter.updateOne(
-      { id: enrollment.id!, changes: enrollment },
-      { ...state, loading: false }
-    )
-  ),
+  
+  on(EnrollmentActions.updateEnrollmentSuccess, (state, { enrollment }) => ({
+    ...state,
+    enrollments: state.enrollments.map(item => 
+      item.id === enrollment.id ? enrollment : item
+    ),
+    loading: false
+  })),
+  
   on(EnrollmentActions.updateEnrollmentFailure, (state, { error }) => ({
     ...state,
-    error
+    error,
+    loading: false
   })),
 
   // Delete
@@ -69,11 +82,16 @@ export const enrollmentReducer = createReducer(
     loading: true,
     error: null
   })),
-  on(EnrollmentActions.deleteEnrollmentSuccess, (state, { id }) =>
-    adapter.removeOne(id, { ...state, loading: false })
-  ),
+  
+  on(EnrollmentActions.deleteEnrollmentSuccess, (state, { id }) => ({
+    ...state,
+    enrollments: state.enrollments.filter(enrollment => enrollment.id !== id),
+    loading: false
+  })),
+  
   on(EnrollmentActions.deleteEnrollmentFailure, (state, { error }) => ({
     ...state,
-    error
+    error,
+    loading: false
   }))
 );

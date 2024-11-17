@@ -23,7 +23,10 @@
       "dom"
     ],
     "paths": {
-      "@services/*": ["src/app/services/*"]
+      "@services/*": ["src/app/services/*"],
+      "@shared/*": ["src/app/shared/*"],
+      "@core/*": ["src/app/core/*"],
+      "@store/*": ["src/app/store/*"]
     },
     "baseUrl": ".",
   },

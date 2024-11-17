@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, switchMap, map, finalize } from 'rxjs';
+import { Observable, switchMap, map, finalize, tap, combineLatest } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Course } from '../../../../shared/models/course.model';
 import { Enrollment } from '../../../../shared/models/enrollment.model';
@@ -26,7 +26,7 @@ export class CourseDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private coursesService: CourseService,
     private enrollmentService: EnrollmentService,
-    private store: Store,
+    private store: Store<{ enrollments: { enrollments: Enrollment[], loading: boolean } }>,
     private dialog: MatDialog,
     private authService: AuthService
   ) {
@@ -35,23 +35,17 @@ export class CourseDetailComponent implements OnInit {
 
   ngOnInit() {
     this.route.params.pipe(
-      switchMap(params => this.coursesService.getCourseById(Number(params['id'])))
-    ).subscribe(course => {
-      this.course = course;
-      this.loadEnrollments();
+      switchMap(params => this.coursesService.getCourseById(Number(params['id']))),
+      tap(course => this.course = course),
+      switchMap(course => {
+        this.loading = true;
+        return this.enrollmentService.getEnrollmentsByCourseId(course.id!).pipe(
+          finalize(() => this.loading = false)
+        );
+      })
+    ).subscribe(enrollments => {
+      this.enrollments = enrollments;
     });
-  }
-
-  loadEnrollments() {
-    if (this.course?.id) {
-      this.loading = true;
-      this.enrollmentService.getEnrollments().pipe(
-        map(enrollments => enrollments.filter(e => e.courseId === this.course?.id)),
-        finalize(() => this.loading = false)
-      ).subscribe(enrollments => {
-        this.enrollments = enrollments;
-      });
-    }
   }
 
   unenroll(enrollmentId: number) {
@@ -62,7 +56,6 @@ export class CourseDetailComponent implements OnInit {
         message: '¿Estás seguro de que deseas desmatricular este alumno del curso?',
         onConfirm: () => {
           this.store.dispatch(EnrollmentActions.deleteEnrollment({ id: enrollmentId }));
-          this.loadEnrollments();
         }
       }
     });
