@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, switchMap, map, finalize, tap, combineLatest } from 'rxjs';
+import { Observable, switchMap, map, finalize, tap, combineLatest, Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Course } from '../../../../shared/models/course.model';
 import { Enrollment } from '../../../../shared/models/enrollment.model';
@@ -16,17 +16,18 @@ import { AuthService } from 'src/app/core/services/auth.service';
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.css']
 })
-export class CourseDetailComponent implements OnInit {
+export class CourseDetailComponent implements OnInit, OnDestroy {
   course: Course | null = null;
   enrollments: Enrollment[] = [];
   loading = false;
   isAdmin = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
     private coursesService: CourseService,
     private enrollmentService: EnrollmentService,
-    private store: Store<{ enrollments: { enrollments: Enrollment[], loading: boolean } }>,
+    private store: Store,
     private dialog: MatDialog,
     private authService: AuthService
   ) {
@@ -34,18 +35,36 @@ export class CourseDetailComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadCourseData();
+    // Suscribirse a los cambios en el store de enrollments
+    this.store.select((state: any) => state.enrollments)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.course?.id) {
+          this.loadEnrollments(this.course.id);
+        }
+      });
+  }
+
+  private loadCourseData() {
     this.route.params.pipe(
       switchMap(params => this.coursesService.getCourseById(Number(params['id']))),
-      tap(course => this.course = course),
-      switchMap(course => {
-        this.loading = true;
-        return this.enrollmentService.getEnrollmentsByCourseId(course.id!).pipe(
-          finalize(() => this.loading = false)
-        );
+      tap(course => {
+        this.course = course;
+        if (course?.id) {
+          this.loadEnrollments(course.id);
+        }
       })
-    ).subscribe(enrollments => {
-      this.enrollments = enrollments;
-    });
+    ).subscribe();
+  }
+
+  private loadEnrollments(courseId: number) {
+    this.loading = true;
+    this.enrollmentService.getEnrollmentsByCourseId(courseId)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe(enrollments => {
+        this.enrollments = enrollments;
+      });
   }
 
   unenroll(enrollmentId: number) {
@@ -59,5 +78,10 @@ export class CourseDetailComponent implements OnInit {
         }
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 } 

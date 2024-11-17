@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, switchMap, map, finalize, tap, combineLatest } from 'rxjs';
+import { Observable, switchMap, map, finalize, tap, combineLatest, Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { Student } from '../../../../shared/models/student.model';
 import { Enrollment } from '../../../../shared/models/enrollment.model';
@@ -16,17 +16,18 @@ import { AuthService } from '../../../../core/services/auth.service';
   templateUrl: './student-detail.component.html',
   styleUrls: ['./student-detail.component.css']
 })
-export class StudentDetailComponent implements OnInit {
+export class StudentDetailComponent implements OnInit, OnDestroy {
   student: Student | null = null;
   enrollments: Enrollment[] = [];
   loading = false;
   isAdmin = false;
+  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
     private studentsService: StudentsService,
     private enrollmentService: EnrollmentService,
-    private store: Store<{ enrollments: { enrollments: Enrollment[], loading: boolean } }>,
+    private store: Store,
     private dialog: MatDialog,
     private authService: AuthService
   ) {
@@ -34,18 +35,36 @@ export class StudentDetailComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.loadStudentData();
+    // Suscribirse a los cambios en el store de enrollments
+    this.store.select((state: any) => state.enrollments)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.student?.id) {
+          this.loadEnrollments(this.student.id);
+        }
+      });
+  }
+
+  private loadStudentData() {
     this.route.params.pipe(
       switchMap(params => this.studentsService.getStudentById(Number(params['id']))),
-      tap(student => this.student = student),
-      switchMap(student => {
-        this.loading = true;
-        return this.enrollmentService.getEnrollmentsByStudentId(student.id!).pipe(
-          finalize(() => this.loading = false)
-        );
+      tap(student => {
+        this.student = student;
+        if (student?.id) {
+          this.loadEnrollments(student.id);
+        }
       })
-    ).subscribe(enrollments => {
-      this.enrollments = enrollments;
-    });
+    ).subscribe();
+  }
+
+  private loadEnrollments(studentId: number) {
+    this.loading = true;
+    this.enrollmentService.getEnrollmentsByStudentId(studentId)
+      .pipe(finalize(() => this.loading = false))
+      .subscribe(enrollments => {
+        this.enrollments = enrollments;
+      });
   }
 
   unenroll(enrollmentId: number) {
@@ -59,5 +78,10 @@ export class StudentDetailComponent implements OnInit {
         }
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 } 
