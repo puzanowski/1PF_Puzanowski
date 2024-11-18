@@ -10,24 +10,22 @@ export class EnrollmentEffects {
   loadEnrollments$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(EnrollmentActions.loadEnrollments),
-      mergeMap(() => 
-        this.enrollmentService.getEnrollments().pipe(
+      mergeMap(() => this.enrollmentService.getEnrollments()
+        .pipe(
           map(enrollments => EnrollmentActions.loadEnrollmentsSuccess({ enrollments })),
           catchError(error => of(EnrollmentActions.loadEnrollmentsFailure({ error })))
-        )
-      )
+        ))
     );
   });
 
   addEnrollment$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(EnrollmentActions.addEnrollment),
-      mergeMap(({ enrollment }) => 
-        this.enrollmentService.addEnrollment(enrollment).pipe(
-          map(newEnrollment => EnrollmentActions.addEnrollmentSuccess({ enrollment: newEnrollment })),
+      mergeMap(({ enrollment }) => this.enrollmentService.addEnrollment(enrollment)
+        .pipe(
+          map(() => EnrollmentActions.loadEnrollments()),
           catchError(error => of(EnrollmentActions.addEnrollmentFailure({ error })))
-        )
-      )
+        ))
     );
   });
 

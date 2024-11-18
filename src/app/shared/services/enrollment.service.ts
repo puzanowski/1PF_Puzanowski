@@ -24,34 +24,22 @@ export class EnrollmentService {
       switchMap(enrollments => {
         if (enrollments.length === 0) return of([]);
 
-        // Obtener IDs únicos
         const studentIds = [...new Set(enrollments.map(e => e.studentId))];
         const courseIds = [...new Set(enrollments.map(e => e.courseId))];
 
-        // Obtener datos de estudiantes y cursos
         return forkJoin({
-          students: forkJoin(
-            studentIds.map(id => this.studentsService.getStudentById(id))
-          ),
-          courses: forkJoin(
-            courseIds.map(id => this.courseService.getCourseById(id))
-          )
+          students: this.studentsService.getStudentsByIds(studentIds),
+          courses: this.courseService.getCoursesByIds(courseIds)
         }).pipe(
           map(({ students, courses }) => {
-            // Crear mapas para búsqueda rápida
             const studentMap = new Map(students.map(s => [s.id, s]));
             const courseMap = new Map(courses.map(c => [c.id, c]));
 
-            // Enriquecer cada enrollment con sus datos completos
             return enrollments.map(enrollment => ({
               ...enrollment,
               student: studentMap.get(enrollment.studentId),
-              course: courseMap.get(enrollment.courseId),
-              studentName: studentMap.get(enrollment.studentId) 
-                ? `${studentMap.get(enrollment.studentId)!.firstName} ${studentMap.get(enrollment.studentId)!.lastName}`
-                : '',
-              courseName: courseMap.get(enrollment.courseId)?.name || ''
-            } as Enrollment));
+              course: courseMap.get(enrollment.courseId)
+            }));
           })
         );
       })
@@ -59,25 +47,22 @@ export class EnrollmentService {
   }
 
   addEnrollment(enrollment: Enrollment): Observable<Enrollment> {
-    return forkJoin({
-      student: this.studentsService.getStudentById(enrollment.studentId),
-      course: this.courseService.getCourseById(enrollment.courseId)
-    }).pipe(
-      switchMap(({ student, course }) => {
-        const enrichedEnrollment = {
-          ...enrollment,
-          student,
-          course,
-          studentName: `${student.firstName} ${student.lastName}`,
-          courseName: course.name
-        };
-        return this.http.post<Enrollment>(this.apiUrl, enrichedEnrollment);
-      })
-    );
+    const enrollmentToSave = {
+      studentId: enrollment.studentId,
+      courseId: enrollment.courseId,
+      enrollmentDate: enrollment.enrollmentDate
+    };
+    return this.http.post<Enrollment>(this.apiUrl, enrollmentToSave);
   }
 
   updateEnrollment(enrollment: Enrollment): Observable<Enrollment> {
-    return this.http.put<Enrollment>(`${this.apiUrl}/${enrollment.id}`, enrollment);
+    const enrollmentToUpdate = {
+      id: enrollment.id,
+      studentId: enrollment.studentId,
+      courseId: enrollment.courseId,
+      enrollmentDate: enrollment.enrollmentDate
+    };
+    return this.http.put<Enrollment>(`${this.apiUrl}/${enrollment.id}`, enrollmentToUpdate);
   }
 
   deleteEnrollment(id: number): Observable<void> {

@@ -68,14 +68,10 @@ export class EnrollmentDialogComponent implements OnInit {
 
   onSubmit() {
     if (this.enrollmentForm.valid) {
-      const selectedStudent = this.students.find(s => s.id === this.enrollmentForm.value.studentId);
-      const selectedCourse = this.courses.find(c => c.id === this.enrollmentForm.value.courseId);
-      
       const enrollment: Enrollment = {
         ...this.data.enrollment,
         ...this.enrollmentForm.value,
-        student: selectedStudent,
-        course: selectedCourse
+        id: this.data.enrollment?.id
       };
       
       this.dialogRef.close(enrollment);
