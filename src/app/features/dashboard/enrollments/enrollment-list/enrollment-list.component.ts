@@ -3,8 +3,6 @@ import { Store } from '@ngrx/store';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { tap, switchMap, combineLatest, map } from 'rxjs/operators';
-import { of } from 'rxjs';
 
 import { EnrollmentDisplay } from '@shared/models/enrollment.model';
 import { AuthService } from '@core/services/auth.service';
@@ -12,8 +10,8 @@ import * as EnrollmentActions from '@store/actions/enrollment.actions';
 import { EnrollmentState } from '@store/reducers/enrollment.reducer';
 import { selectAllEnrollments, selectEnrollmentsLoading } from '@store/selectors/enrollment.selectors';
 import { EnrollmentDialogComponent } from '../enrollment-dialog/enrollment-dialog.component';
-import { StudentsService } from '@shared/services/students.service';
-import { CourseService } from '@shared/services/course.service';
+import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confirm-dialog.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-enrollment-list',
@@ -30,7 +28,8 @@ export class EnrollmentListComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<{ enrollments: EnrollmentState }>,
     private dialog: MatDialog,
-    private authService: AuthService
+    private authService: AuthService,
+    private snackBar: MatSnackBar
   ) {
     this.isAdmin = this.authService.isAdmin();
     if (this.isAdmin) {
@@ -43,7 +42,6 @@ export class EnrollmentListComponent implements OnInit, OnDestroy {
     
     this.subscription = this.store.select(selectAllEnrollments)
       .subscribe(enrollments => {
-        console.log('Enrollments:', enrollments);
         const normalizedEnrollments: EnrollmentDisplay[] = enrollments.map(enrollment => ({
           ...enrollment,
           studentName: enrollment.student 
@@ -81,7 +79,28 @@ export class EnrollmentListComponent implements OnInit, OnDestroy {
   }
 
   deleteEnrollment(id: number) {
-    this.store.dispatch(EnrollmentActions.deleteEnrollment({ id }));
+    if (!this.isAdmin) return;
+    
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: {
+        title: 'Confirmar eliminación',
+        message: '¿Estás seguro de que deseas eliminar esta asignación?',
+        onConfirm: () => {
+          this.store.dispatch(EnrollmentActions.deleteEnrollment({ id }));
+          this.snackBar.open(
+            'La asignación fue eliminada correctamente',
+            'Cerrar',
+            {
+              duration: 3000,
+              panelClass: ['success-snackbar'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top'
+            }
+          );
+        }
+      }
+    });
   }
 
   ngOnDestroy() {

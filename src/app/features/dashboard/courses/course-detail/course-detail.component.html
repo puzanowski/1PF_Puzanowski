@@ -27,6 +27,9 @@
           <mat-list-item *ngFor="let enrollment of enrollments">
             <div class="enrollment-item">
               <span>{{ enrollment.student?.firstName }} {{ enrollment.student?.lastName }}</span>
+              <small class="enrollment-date">
+                {{enrollment.enrollmentDate | date:'mediumDate':'':'es'}}
+              </small>
               <button
                 mat-icon-button
                 color="warn"

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, mergeMap, catchError } from 'rxjs/operators';
+import { map, mergeMap, catchError, switchMap } from 'rxjs/operators';
 import { EnrollmentService } from '../../shared/services/enrollment.service';
 import * as EnrollmentActions from '../actions/enrollment.actions';
 
@@ -21,11 +21,22 @@ export class EnrollmentEffects {
   addEnrollment$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(EnrollmentActions.addEnrollment),
-      mergeMap(({ enrollment }) => this.enrollmentService.addEnrollment(enrollment)
-        .pipe(
-          map(() => EnrollmentActions.loadEnrollments()),
-          catchError(error => of(EnrollmentActions.addEnrollmentFailure({ error })))
-        ))
+      mergeMap(({ enrollment }) => 
+        this.enrollmentService.checkDuplicateEnrollment(enrollment.studentId, enrollment.courseId)
+          .pipe(
+            switchMap(isDuplicate => {
+              if (isDuplicate) {
+                return of(EnrollmentActions.addEnrollmentFailure({ 
+                  error: 'El alumno ya está inscrito en este curso' 
+                }));
+              }
+              return this.enrollmentService.addEnrollment(enrollment).pipe(
+                map(() => EnrollmentActions.loadEnrollments()),
+                catchError(error => of(EnrollmentActions.addEnrollmentFailure({ error })))
+              );
+            })
+          )
+      )
     );
   });
 

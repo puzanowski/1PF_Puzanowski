@@ -36,7 +36,7 @@ export class CourseDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadCourseData();
-    // Suscribirse a los cambios en el store de enrollments
+    
     this.store.select((state: any) => state.enrollments)
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {

@@ -126,4 +126,11 @@ export class EnrollmentService {
       })
     );
   }
+
+  checkDuplicateEnrollment(studentId: number, courseId: number): Observable<boolean> {
+    return this.http.get<Enrollment[]>(`${this.apiUrl}?studentId=${studentId}&courseId=${courseId}`)
+      .pipe(
+        map(enrollments => enrollments.length > 0)
+      );
+  }
 }

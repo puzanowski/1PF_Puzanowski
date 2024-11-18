@@ -8,6 +8,7 @@ import { CourseDialogComponent } from '../course-dialog/course-dialog.component'
 import * as CourseActions from '../../../../store/actions/course.actions';
 import { selectAllCourses, selectCoursesLoading } from '../../../../store/selectors/course.selectors';
 import { AuthService } from '../../../../core/services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-course-list',
@@ -24,6 +25,7 @@ export class CourseListComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store,
     private dialog: MatDialog,
+    private snackBar: MatSnackBar,
     private authService: AuthService
   ) {
     this.isAdmin = this.authService.currentUser?.role === 'admin';
@@ -72,6 +74,16 @@ export class CourseListComponent implements OnInit, OnDestroy {
         onConfirm: () => {
           this.store.dispatch(CourseActions.deleteCourse({ id: course.id! }));
           this.store.dispatch(CourseActions.loadCourses());
+          this.snackBar.open(
+            'El curso fue eliminado correctamente',
+            'Cerrar',
+            {
+              duration: 3000,
+              panelClass: ['success-snackbar'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top'
+            }
+          );
         }
       }
     });

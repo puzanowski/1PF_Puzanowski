@@ -5,6 +5,9 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { LOCALE_ID } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es';
 
 import { AppComponent } from './app.component';
 import { HeaderDirective } from './shared/directives/header.directive';
@@ -20,6 +23,8 @@ import { enrollmentReducer } from './store/reducers/enrollment.reducer';
 import { EnrollmentEffects } from './store/effects/enrollment.effects';
 import { UserEffects } from './store/effects/user.effects';
 import { userReducer } from './store/reducers/user.reducer';
+
+registerLocaleData(localeEs, 'es');
 
 @NgModule({
   declarations: [
@@ -46,7 +51,9 @@ import { userReducer } from './store/reducers/user.reducer';
       logOnly: false
     })
   ],
-  providers: [],
+  providers: [
+    { provide: LOCALE_ID, useValue: 'es' }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
